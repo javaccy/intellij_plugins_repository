@@ -1,0 +1,12 @@
+
+<!DOCTYPE plugins [
+        <!ELEMENT
+                plugins(plugin)*>
+        <!ELEMENT
+                plugin (#PCDATA)>
+        <!ATTLIST
+                plugin id CDATA #REQUIRED url DATA #REQUIRED version CDATA #REQUIRED>]>
+
+<plugins>
+    <plugin id="" url="" version=""/>
+</plugins>
