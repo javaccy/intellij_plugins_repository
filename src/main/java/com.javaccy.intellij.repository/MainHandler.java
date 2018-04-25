@@ -94,13 +94,15 @@ public class MainHandler extends AbstractHandler {
             out = response.getWriter();
             File dir = getUploadDir();
             out.print("<plugins>");
+            String version = "";
             for (File username : dir.listFiles()) {
                 if (username.isDirectory()) {
                     for (File id : username.listFiles()) {
                         if (id.isDirectory()) {
                             for (File file : id.listFiles()) {
+                                version = file.getName().substring(file.getName().indexOf(".")+2,file.getName().lastIndexOf("."));
                                 if (file.getName().endsWith(".zip") || file.getName().endsWith(".jar")) {
-                                    out.print("<plugin id=\"" + id.getName() + "\" url=\"" + getBasePath(request) + downloadPath + username.getName() + File.separator + id.getName() + File.separator + file.getName() + "\" version=\"2.0\"/>");
+                                    out.print("<plugin id=\"" + id.getName() + "\" url=\"" + getBasePath(request) + downloadPath + username.getName() + File.separator + id.getName() + File.separator + file.getName() + "\" version=\""+version+"\"/>");
                                 }
                             }
                         }
