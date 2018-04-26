@@ -1,8 +1,6 @@
 package com.javaccy.intellij.repository;
 
 import org.eclipse.jetty.server.Server;
-
-import javax.servlet.http.HttpServletRequest;
 import java.io.*;
 
 public class Main{
