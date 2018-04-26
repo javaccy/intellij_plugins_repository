@@ -22,24 +22,16 @@ public class MainHandler extends AbstractHandler {
     private static String uploadPath = "/upload/";
     private static String regPath = "/reg/";
 
-    // 上传文件存储目录
-    private static final String UPLOAD_DIRECTORY = "upload";
     // 上传配置
     private static final int MEMORY_THRESHOLD   = 1024 * 1024 * 3;  // 3MB
     private static final int MAX_FILE_SIZE      = 1024 * 1024 * 40; // 40MB
     private static final int MAX_REQUEST_SIZE   = 1024 * 1024 * 50; // 50MB
 
-    public static File getUploadDir() {
-        File dir = new File(new File("").getAbsolutePath() + File.separator + UPLOAD_DIRECTORY);
-        if (!dir.exists()) {
-            dir.mkdirs();
-        }
-        return dir;
-    }
+
 
 
     public static File getUploadDir(String username,String child) {
-        File dir = new File(getUploadDir() + File.separator + username + File.separator + child + File.separator);
+        File dir = new File(Main.getUploadDir() + File.separator + username + File.separator + child + File.separator);
         if (!dir.exists()) {
             dir.mkdirs();
         }
@@ -48,10 +40,7 @@ public class MainHandler extends AbstractHandler {
 
 
 
-    public static String getBasePath(HttpServletRequest request){
-        return "http://plugins.idea.javaccy.giize.com";
-        //return "http://192.168.99.186:6868";
-    }
+
 
     public static Double getVersion(String str) {
         StringBuffer sb = new StringBuffer();
@@ -74,10 +63,11 @@ public class MainHandler extends AbstractHandler {
      * @param response
      */
     public static void download(HttpServletRequest request,HttpServletResponse response) {
+        System.out.println("下载url："+request.getRequestURI());
         BufferedInputStream in = null;
         BufferedOutputStream out = null;
         try {
-            String s = getUploadDir() + File.separator + request.getRequestURI().substring(downloadPath.length(), request.getRequestURI().length());
+            String s = Main.getUploadDir() + File.separator + request.getRequestURI().substring(downloadPath.length(), request.getRequestURI().length());
             File file = new File(s);
             FileInputStream f = new FileInputStream(file);
             in = new BufferedInputStream(f);
@@ -127,7 +117,7 @@ public class MainHandler extends AbstractHandler {
         try {
             response.setHeader("Content-Type","application/xml");
             out = response.getWriter();
-            File dir = getUploadDir();
+            File dir = Main.getUploadDir();
             out.print("<plugins>");
             for (File username : dir.listFiles()) {
                 if (username.isDirectory()) {
@@ -144,7 +134,7 @@ public class MainHandler extends AbstractHandler {
                                 //判断大版本是否相同，例如：181.1124.23 = 181.32445.999
                                 if (bigVersion == clientBigVer || clientBigVer == 0) {//clientBigVer = 0时全部返回方便测试
                                     if (file.getName().endsWith(".zip") || file.getName().endsWith(".jar")) {
-                                        out.print("<plugin id=\"" + id.getName() + "\" url=\"" + getBasePath(request) + downloadPath + username.getName() + File.separator + id.getName() + File.separator + file.getName() + "\" version=\""+version+"\"/>");
+                                        out.print("<plugin id=\"" + id.getName() + "\" url=\"" + Main.getBasePath() + downloadPath + username.getName() + File.separator + id.getName() + File.separator + file.getName() + "\" version=\""+version+"\"/>");
                                     }
                                 }
 
@@ -188,7 +178,7 @@ public class MainHandler extends AbstractHandler {
         String username = request.getParameter("username");
         String password = request.getParameter("password");
         if (username == null && username.trim().length() >= 2 && password != null && password.length() > 5) {
-            File dir = new File(getUploadDir()+File.separator+username);
+            File dir = new File(Main.getUploadDir() + File.separator + username);
             if (!dir.exists()) {
                 dir.exists();
             }
@@ -225,6 +215,7 @@ public class MainHandler extends AbstractHandler {
                 for (FileItem fileItem : fileItems) {
                     if (fileItem.isFormField()) {
                         fields.put(fileItem.getFieldName(), fileItem.getString());
+                        Main.log(fileItem.getFieldName() + ":" + fileItem.getString());
                     }
                 }
                 File file;
@@ -232,7 +223,7 @@ public class MainHandler extends AbstractHandler {
                     if(!fileItem.isFormField()) {
                         file = new File(getUploadDir(fields.get("userName"),fields.get("xmlId")) + File.separator +  fileItem.getName());
                         FileUtils.copyInputStreamToFile(fileItem.getInputStream(), file);
-
+                        Main.log("上传成功；"+file.getAbsolutePath()+file.getName());
                     }
                 }
                 out = response.getWriter();
