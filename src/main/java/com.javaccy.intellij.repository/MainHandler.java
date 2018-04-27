@@ -103,7 +103,7 @@ public class MainHandler extends AbstractHandler {
     public static void updatePlugins(HttpServletRequest request, HttpServletResponse response){
         //IC-181.4445.78
         String build = request.getParameter("build");
-        System.out.println("build:"+build);
+        Main.log("build:"+build);
         Double clientVer = 0D;
         int clientBigVer = 0;
         if (build != null) {
@@ -222,6 +222,9 @@ public class MainHandler extends AbstractHandler {
                 for (FileItem fileItem : fileItems) {
                     if(!fileItem.isFormField()) {
                         file = new File(getUploadDir(fields.get("userName"),fields.get("xmlId")) + File.separator +  fileItem.getName());
+                        if (file.getAbsolutePath().contains("..")) {
+                            System.out.println("错误的路径:"+file.getAbsolutePath());
+                        }
                         FileUtils.copyInputStreamToFile(fileItem.getInputStream(), file);
                         Main.log("上传成功；"+file.getAbsolutePath()+file.getName());
                     }

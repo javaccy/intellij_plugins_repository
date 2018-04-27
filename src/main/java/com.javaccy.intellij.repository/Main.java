@@ -36,6 +36,7 @@ public class Main{
         if (args.length > 3) {
             logPath = args[3];
         }
+        getLogger();
         log("started.......");
         Server server = new Server(port);
         server.setHandler(new MainHandler());
@@ -44,18 +45,21 @@ public class Main{
         server.join();
     }
 
-    public static int getPort() {
-        return port;
-    }
-
-    public PrintStream getLogger() throws IOException {
-        if (logPath != null && !"0".equals(logPath)) {
-            logger = new PrintStream(logPath);
-            System.setOut(logger);
-        } else {
-            logger = System.out;
+    public static PrintStream getLogger() throws IOException {
+        if (logger != null) {
+            return logger;
         }
-
+        if (logPath != null && !"0".equals(logPath)) {
+            File file = new File(logPath);
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+            if (file.isFile()) {
+                logger = new PrintStream(logPath);
+                System.setOut(logger);
+            }
+        }
+        logger = System.out;
         return logger;
     }
 
@@ -70,7 +74,7 @@ public class Main{
         //File dir = new File(new File("").getAbsolutePath() + File.separator + UPLOAD_DIRECTORY);
         if (path == null || !path.startsWith("/") || "0".equals(path)) {
             //path = Main.class.getResource("/").getPath();
-            path = new File("").getAbsolutePath();
+            path = new File("").getAbsolutePath();//运行java 命令时的 pwd 返回结果
         }
 
         File dir = new File(path + File.separator + UPLOAD_DIRECTORY);
@@ -84,8 +88,7 @@ public class Main{
         if (host != null && !"0".equals(host)) {
             return host;
         } else {
-            return "http://plugins.idea.javaccy.giize.com";
+            return "http://127.0.0.1:"+port;
         }
-        //return "http://192.168.99.186:6868";
     }
 }
