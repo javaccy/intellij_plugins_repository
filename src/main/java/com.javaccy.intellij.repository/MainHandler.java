@@ -108,7 +108,7 @@ public class MainHandler extends AbstractHandler {
         int clientBigVer = 0;
         if (build != null) {
             clientVer = getVersion(build);
-            clientVer.intValue();
+            clientBigVer = clientVer.intValue();
         }
         Double version;
         int bigVersion;
