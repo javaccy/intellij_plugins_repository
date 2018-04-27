@@ -12,9 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.*;
 import java.net.URLEncoder;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class MainHandler extends AbstractHandler {
 
@@ -114,11 +112,12 @@ public class MainHandler extends AbstractHandler {
         int bigVersion;
         String fileName;
         PrintWriter out = null;
+        String url = "";
+        List<Plugin> plugins = new ArrayList();
         try {
             response.setHeader("Content-Type","application/xml");
             out = response.getWriter();
             File dir = Main.getUploadDir();
-            out.print("<plugins>");
             for (File username : dir.listFiles()) {
                 if (username.isDirectory()) {
                     for (File id : username.listFiles()) {
@@ -134,7 +133,8 @@ public class MainHandler extends AbstractHandler {
                                 //判断大版本是否相同，例如：181.1124.23 = 181.32445.999
                                 if (bigVersion == clientBigVer || clientBigVer == 0) {//clientBigVer = 0时全部返回方便测试
                                     if (file.getName().endsWith(".zip") || file.getName().endsWith(".jar")) {
-                                        out.print("<plugin id=\"" + id.getName() + "\" url=\"" + Main.getBasePath() + downloadPath + username.getName() + File.separator + id.getName() + File.separator + file.getName() + "\" version=\""+version+"\"/>");
+                                        url = Main.getBasePath() + downloadPath + username.getName() + File.separator + id.getName() + File.separator + file.getName();
+                                        plugins.add(new Plugin(id.getName(),url, version, bigVersion));
                                     }
                                 }
 
@@ -143,6 +143,11 @@ public class MainHandler extends AbstractHandler {
                     }
 
                 }
+            }
+            Collections.sort(plugins);
+            out.print("<plugins>");
+            for (Plugin p : plugins) {
+                out.print("<plugin id=\"" + p.getId() + "\" url=\"" + p.getUrl() + "\" version=\"" + p.getVersion() + "\"/>");
             }
             out.print("</plugins>");
         } catch (IOException e) {
