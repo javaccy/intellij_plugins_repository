@@ -71,6 +71,7 @@ public class MainHandler extends AbstractHandler {
             in = new BufferedInputStream(f);
             out = new BufferedOutputStream(response.getOutputStream());
             String filename=URLEncoder.encode(file.getName(),"utf-8");
+            response.setHeader("Content-Length", ""+file.length());
             response.setHeader("Content-Disposition","attachment; filename="+filename+"");
             response.setCharacterEncoding("utf-8");
             byte[] bytes = new byte[1024];
